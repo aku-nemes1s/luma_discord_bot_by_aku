@@ -38,7 +38,7 @@ def generate_video(prompt: str):
         headers=headers,
         json={
             "prompt": prompt,
-            "model": "ray-2",  # ✅ use a supported model, e.g. ray-2, ray-flash-2
+            "model": "ray-3",  # ✅ use a supported model, e.g. ray-2, ray-flash-2
             "resolution": "720p",
             "duration": "5s"
         }
