@@ -12,10 +12,9 @@ intents = discord.Intents.default()
 class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
-        self.tree = discord.app_commands.CommandTree(self)
 
     async def setup_hook(self):
-        await self.tree.sync()  # registers slash commands
+        await self.tree.sync()  # register slash commands with Discord
 
 bot = MyBot()
 
