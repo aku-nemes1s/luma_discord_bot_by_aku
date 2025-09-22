@@ -2,27 +2,15 @@ import os
 import discord
 from discord.ext import commands
 import requests
-import asyncio
+import time
 
 # Tokens from Railway environment variables
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 LUMA_API_KEY = os.getenv("LUMA_API_KEY")
 
 intents = discord.Intents.default()
+bot = commands.Bot(command_prefix="/", intents=intents)
 
-# Use a class to support slash commands
-class MyBot(commands.Bot):
-    def __init__(self):
-        super().__init__(command_prefix="!", intents=intents)
-        self.tree = discord.app_commands.CommandTree(self)
-
-    async def setup_hook(self):
-        # Register slash commands globally
-        await self.tree.sync()
-
-bot = MyBot()
-
-# Video generation function (same as yours)
 def generate_video(prompt: str):
     headers = {
         "Authorization": f"Bearer {LUMA_API_KEY}",
@@ -55,23 +43,19 @@ def generate_video(prompt: str):
         elif state == "failed":
             return None, "Generation failed."
 
-        # Wait asynchronously to avoid blocking Discord
-        asyncio.sleep(5)
+        time.sleep(5)
 
     return None, "Timeout waiting for video."
 
-# Slash command
-@bot.tree.command(name="luma", description="Generate video with Luma AI")
-async def luma(interaction: discord.Interaction, prompt: str):
-    await interaction.response.send_message(f"🎥 Generating video for: `{prompt}` ... please wait!")
+@bot.command(name="luma")
+async def luma(ctx, *, prompt: str):
+    await ctx.send(f"🎥 Generating video for: `{prompt}` ... please wait!")
 
-    # Run blocking code in executor to avoid freezing bot
-    loop = asyncio.get_event_loop()
-    video_url, error = await loop.run_in_executor(None, generate_video, prompt)
+    video_url, error = generate_video(prompt)
 
     if error:
-        await interaction.followup.send(f"❌ {error}")
+        await ctx.send(f"❌ {error}")
     else:
-        await interaction.followup.send(f"✅ Done! Here’s your video:\n{video_url}")
+        await ctx.send(f"✅ Done! Here’s your video:\n{video_url}")
 
 bot.run(DISCORD_TOKEN)
