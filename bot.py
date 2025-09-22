@@ -29,6 +29,7 @@ def generate_video(prompt: str):
         json={"prompt": prompt, "model": "ray-3-reasoning"}
     )
     data = response.json()
+    print("DEBUG LUMA STATUS:", response.status_code)
     print("DEBUG LUMA RESPONSE:", data) 
     generation_id = data.get("id")
     if not generation_id:
